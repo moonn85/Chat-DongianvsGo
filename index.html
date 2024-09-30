@@ -31,11 +31,22 @@
             position: relative;
         }
 
+        .header {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
         #messages {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
             border-bottom: 1px solid #ddd;
+            margin-top: 40px; /* Để dành chỗ cho tiêu đề */
         }
 
         .message {
@@ -146,6 +157,8 @@
 </head>
 <body>
     <div class="chat-container">
+        <!-- Thêm phần tiêu đề "Chat đơn giản với GO" -->
+        <div class="header">Chat đơn giản với GO</div>
         <div id="messages"></div>
         <div style="display: flex;">
             <input type="text" id="messageInput" placeholder="Nhập tin nhắn...">
