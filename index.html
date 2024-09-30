@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go WebSocket Chat</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(135deg, #f06, #004d7a);
+            background-size: cover;
+        }
+
+        .chat-container {
+            width: 400px;
+            height: 600px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: #e1ffc7;
+            max-width: 70%;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        .my-message {
+            margin-left: auto;
+            background-color: #d0eaff;
+        }
+
+        #messageInput {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-top: 1px solid #ddd;
+            outline: none;
+            font-size: 16px;
+            border-bottom-left-radius: 12px;
+        }
+
+        button {
+            padding: 15px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            outline: none;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom-right-radius: 12px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Scrollbar custom */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 123, 255, 0.6);
+            border-radius: 4px;
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+    <script>
+        let ws;
+
+        window.onload = function() {
+            ws = new WebSocket("ws://localhost:8080/ws");
+
+            ws.onmessage = function(event) {
+                let messages = document.getElementById("messages");
+                let msg = JSON.parse(event.data);
+
+                let messageElement = document.createElement("div");
+                messageElement.className = "message";
+                messageElement.innerHTML = `<strong>${msg.sender}</strong>: ${msg.content} <span style="font-size: 12px; color: gray;">(${msg.time})</span>`;
+                messages.appendChild(messageElement);
+
+                // Tự động scroll xuống dưới khi có tin nhắn mới
+                messages.scrollTop = messages.scrollHeight;
+            };
+        };
+
+        function sendMessage() {
+            let input = document.getElementById("messageInput");
+            let msg = {
+                content: input.value,
+                sender: "Me",
+                time: new Date().toLocaleTimeString()
+            };
+            ws.send(JSON.stringify(msg));
+            input.value = "";
+
+            let messages = document.getElementById("messages");
+            let messageElement = document.createElement("div");
+            messageElement.className = "message my-message";
+            messageElement.innerHTML = `<strong>${msg.sender}</strong>: ${msg.content} <span style="font-size: 12px; color: gray;">(${msg.time})</span>`;
+            messages.appendChild(messageElement);
+
+            // Tự động scroll xuống dưới khi gửi tin nhắn
+            messages.scrollTop = messages.scrollHeight;
+        }
+    </script>
+</head>
+<body>
+    <div class="chat-container">
+        <div id="messages"></div>
+        <div style="display: flex;">
+            <input type="text" id="messageInput" placeholder="Nhập tin nhắn...">
+            <button onclick="sendMessage()">Gửi</button>
+        </div>
+    </div>
+</body>
+</html>
